@@ -2,14 +2,15 @@ import Cookies from 'js-cookie'
 
 const state = {
   sidebar: {
-    opened: Cookies.get('sidebarStatus') ? !!+Cookies.get('sidebarStatus') : true,
+    opened: Cookies.get('sidebarStatus')
+      ? !!+Cookies.get('sidebarStatus')
+      : true,
     withoutAnimation: false
   },
   device: 'desktop' // 还有可能是'mobile'
 }
 
 const mutations = {
-  
   TOGGLE_SIDEBAR: state => {
     state.sidebar.opened = !state.sidebar.opened
     state.sidebar.withoutAnimation = false
@@ -19,20 +20,19 @@ const mutations = {
       Cookies.set('sidebarStatus', 0)
     }
   },
-  
+
   CLOSE_SIDEBAR: (state, withoutAnimation) => {
     Cookies.set('sidebarStatus', 0)
     state.sidebar.opened = false
     state.sidebar.withoutAnimation = withoutAnimation
   },
-  
+
   TOGGLE_DEVICE: (state, device) => {
     state.device = device
   }
 }
 
 const actions = {
-
   toggleSideBar({ commit }) {
     commit('TOGGLE_SIDEBAR')
   },

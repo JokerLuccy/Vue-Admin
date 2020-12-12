@@ -9,7 +9,7 @@ import getters from './getters'
 
 Vue.use(Vuex)
 
-/* 
+/*
 动态加载vuex中所有的modules模块
 不再需要通过import手动一个一个引入
 */
@@ -23,7 +23,7 @@ const modules = context.keys().reduce((modules, modulePath) => {
 
 // 创建store对象
 const store = new Vuex.Store({
-  /* 
+  /*
   modules: {
     app,
     permission,
@@ -31,7 +31,7 @@ const store = new Vuex.Store({
     user
   }, */
   modules,
-  getters,
+  getters
 })
 
 export default store

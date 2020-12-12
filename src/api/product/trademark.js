@@ -1,11 +1,3 @@
-/*
- * @Author: your name
- * @Date: 2020-12-11 15:05:27
- * @LastEditTime: 2020-12-11 15:14:21
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: \shop-admin_base\src\api\product\trademark.js
- */
 import request from '@/utils/request'
 
 const api_name = '/admin/product/baseTrademark'

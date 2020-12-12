@@ -6,7 +6,7 @@
       style="margin-bottom: 20px"
       @click="showAdd"
     >添加</el-button>
-    <el-table :data="tradeMarkList" style="width: 100%">
+    <el-table v-loading="loading" :data="tradeMarkList" style="width: 100%">
       <el-table-column type="index" :index="1" label="序号" />
       <el-table-column prop="tmName" label="品牌名称" w />
 
@@ -99,7 +99,7 @@ export default {
         tmName: '',
         logoUrl: ''
       },
-      title: '',
+      loading: false,
       rules: {
         tmName: [
           {
@@ -131,6 +131,7 @@ export default {
       this.saveTradeMarkList()
     },
     async saveTradeMarkList() {
+      this.loading = true
       try {
         const tradeMarkList = await this.$API.trademark.getTradeMarkList(
           this.currentPage,
@@ -147,6 +148,7 @@ export default {
       } catch (error) {
         this.$message.error('获取品牌列表失败')
       }
+      this.loading = false
     },
     beforeAvatarUpload(file) {
       const fileTypes = ['image/jpeg', 'image/png', 'image/jpg']
@@ -164,29 +166,36 @@ export default {
     handleAvatarSuccess(res) {
       this.tradeMarkForm.logoUrl = res.data
     },
+    // 修改或提交品牌数据
     submitForm(tradeMarkForm) {
-      console.log(this.$refs[tradeMarkForm])
       this.$refs[tradeMarkForm].validate(async valid => {
         if (valid) {
           let res
           if (this.tradeMarkForm.id) {
-            res = await this.$API.trademark.updateTradeMark(this.tradeMarkForm)
-            if (res.code === 200) {
-              this.$message.success('修改成功')
-              this.dialogVisible = false
-              this.saveTradeMarkList()
-            } else {
-              this.$message.error('修改失败')
+            const tradeMark = this.tradeMarkList.find(
+              item => item.id === this.tradeMarkForm.id
+            )
+            if (
+              tradeMark.tmName === this.tradeMarkForm.tmName &&
+              tradeMark.logoUrl === this.tradeMarkForm.logoUrl
+            ) {
+              this.$message.warning('请修改数据')
+              return
             }
+            res = await this.$API.trademark.updateTradeMark(this.tradeMarkForm)
           } else {
             res = await this.$API.trademark.addTradeMark(this.tradeMarkForm)
-            if (res.code === 200) {
-              this.$message.success('添加品牌成功')
-              this.dialogVisible = false
-              this.saveTradeMarkList()
-            } else {
-              this.$message.error('添加商品失败')
-            }
+          }
+          if (res.code === 200) {
+            this.$message.success(
+              `${this.tradeMarkForm.id ? '修改' : '添加'}品牌成功`
+            )
+            this.dialogVisible = false
+            this.saveTradeMarkList()
+          } else {
+            this.$message.error(
+              `${this.tradeMarkForm.id ? '修改' : '添加'}品牌失败`
+            )
           }
         } else {
           console.log('error submit!!')
@@ -194,21 +203,21 @@ export default {
         }
       })
     },
+    // 删除品牌数据
     async removeTradeMark(id) {
       await this.$API.trademark.removeTradeMark(id)
       await this.saveTradeMarkList()
     },
+
     updateTradeMark(row) {
+      this.$refs.tradeMarkForm && this.$refs.tradeMarkForm.clearValidate()
       this.tradeMarkForm = {
         ...row
       }
       this.dialogVisible = true
-
-      // const res = await this.$API.trademark.updateTradeMark(this.tradeMarkForm)
-      // console.log(res)
-      // this.saveTradeMarkList()
     },
     showAdd() {
+      this.$refs.tradeMarkForm && this.$refs.tradeMarkForm.clearValidate()
       this.tradeMarkForm = {
         tmName: '',
         logoUrl: ''
