@@ -169,11 +169,9 @@ export default {
     },
     async saveModify() {
       const res = await this.$API.attr.saveAttrInfo(this.attrInfo)
-      console.log(res)
       if (res.code === 200) {
         this.$message.success('修改成功')
         this.isShow = true
-        console.log(this.category)
         this.getAttrInfoList(this.category)
       } else {
         this.$message.error('修改失败')

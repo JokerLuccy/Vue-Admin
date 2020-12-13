@@ -8,7 +8,7 @@
     >添加</el-button>
     <el-table v-loading="loading" :data="tradeMarkList" style="width: 100%">
       <el-table-column type="index" :index="1" label="序号" />
-      <el-table-column prop="tmName" label="品牌名称" w />
+      <el-table-column prop="tmName" label="品牌名称" />
 
       <el-table-column label="品牌LOGO">
         <template slot-scope="scope">
