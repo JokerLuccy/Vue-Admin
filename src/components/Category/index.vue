@@ -60,6 +60,7 @@ export default {
   },
   data() {
     return {
+      isShow: true,
       category: {
         category1Id: '',
         category2Id: '',
@@ -80,10 +81,14 @@ export default {
         this.category.category3Id = ''
         this.category2List = []
         this.category3List = []
+        this.$emit('clearList')
+        this.$bus.$emit('clearList')
       }
       if (num === 3) {
         this.category.category3Id = ''
         this.category3List = []
+        this.$emit('clearList')
+        this.$bus.$emit('clearList')
       }
       const res = await this.$API.attr[`getCategory${num}`](id)
       res.code === 200
@@ -91,8 +96,12 @@ export default {
         : this.$message.error(`${num}级列表获取失败`)
     },
     getAttrInfoList(category) {
+      this.isShow = false
       this.$emit('change', category)
       this.$emit('spuList', category.category3Id)
+      this.$bus.$emit('change', category)
+      this.$bus.$emit('getSpuList', category.category3Id)
+      this.$bus.$emit('isShowAddBtn', this.isShow)
     }
   }
 }

@@ -1,6 +1,10 @@
 <template>
   <div>
-    <Category :disabled="!isShow" @change="getAttrInfoList" />
+    <Category
+      :disabled="!isShow"
+      @change="getAttrInfoList"
+      @clearList="clearList"
+    />
     <el-card v-show="isShow">
       <el-button
         type="primary"
@@ -119,6 +123,11 @@ export default {
   },
 
   methods: {
+    // 清空列表
+    clearList() {
+      this.attrList = []
+      this.category.category3Id = ''
+    },
     // 获取对应属性列表
     async getAttrInfoList(category) {
       this.category = {

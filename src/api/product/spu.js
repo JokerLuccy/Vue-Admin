@@ -54,5 +54,13 @@ export default {
       method: 'GET',
       url: `${api_name}/spuImageList/${spuId}`
     })
+  },
+  // 更新SPU
+  updateSpuInfo(data) {
+    return request({
+      method: 'POST',
+      url: `${api_name}/updateSpuInfo`,
+      data
+    })
   }
 }
