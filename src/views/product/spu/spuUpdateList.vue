@@ -4,14 +4,15 @@
   <el-card>
     <el-form
       ref="spuForm"
+      :rules="rules"
       label-width="100px"
       class="demo-ruleForm"
       :model="spuForm"
     >
-      <el-form-item label="SPU名称">
+      <el-form-item label="SPU名称" prop="spuName">
         <el-input v-model.trim="spuForm.spuName" placeholder="SPU名称" />
       </el-form-item>
-      <el-form-item label="品牌">
+      <el-form-item label="品牌" prop="tradeMark">
         <el-select v-model="spuForm.tmId" placeholder="请选择品牌">
           <el-option
             v-for="tradeMark in tradeMarkList"
@@ -21,14 +22,14 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="spu描述">
+      <el-form-item label="spu描述" prop="description">
         <el-input
           v-model.trim="spuForm.description"
           type="textarea"
           placeholder="SPU描述"
         />
       </el-form-item>
-      <el-form-item label="spu图片">
+      <el-form-item label="spu图片" prop="spuImageList">
         <el-upload
           :action="`${$BASE_API}/admin/product/fileUpload`"
           list-type="picture-card"
@@ -43,7 +44,7 @@
           </el-dialog>
         </el-upload>
       </el-form-item>
-      <el-form-item label="销售属性">
+      <el-form-item label="销售属性" prop="spuSaleAttr">
         <el-select
           v-model="spuForm.saleAttrId"
           :placeholder="
@@ -76,10 +77,12 @@
           <el-table-column label="属性值名列表" prop="spuSaleAttrList">
             <template v-slot="scope">
               <el-tag
-                v-for="spuSaleAttrValue in scope.row.spuSaleAttrValueList"
+                v-for="(spuSaleAttrValue, index) in scope.row
+                  .spuSaleAttrValueList"
                 :key="spuSaleAttrValue.id"
                 :disable-transitions="false"
                 closable
+                @close="handleClose(scope.row, index)"
               >
                 {{ spuSaleAttrValue.saleAttrValueName }}
               </el-tag>
@@ -141,8 +144,16 @@ export default {
       baseSaleAttrList: [],
       dialogImageUrl: '',
       dialogVisible: false,
-      isShowAttrBtn: true
-      // category3Id: this.category3Id || 0
+      isShowAttrBtn: true,
+      rules: {
+        spuName: [{ required: true, message: '请输入SPU名称' }],
+        description: [{ required: true, message: '请输入SPU描述' }],
+        tradeMark: [{ validator: this.validateTradeMark, required: true }],
+        spuImageList: [
+          { validator: this.validateSpuImageList, required: true }
+        ],
+        spuSaleAttr: [{ validator: this.validateSpuSaleAttr, required: true }]
+      }
     }
   },
   computed: {
@@ -163,7 +174,6 @@ export default {
       this.get_TBSI_List('getSpuById', this.spuForm.id)
       this.get_TBSI_List('getSpuImageList', this.spuForm.id)
     } else {
-      // this.$bus.$on('getCategory3Id', this.getCategory3Id)
       this.get_TBSI_List('getTradeMarkList')
       this.get_TBSI_List('getBaseSaleAttrList')
       this.$set(this.spuForm, 'spuImageList', [])
@@ -171,6 +181,41 @@ export default {
     }
   },
   methods: {
+    // 校验图片数组
+    validateSpuImageList(rule, value, callback) {
+      if (!this.spuForm.spuImageList.length) {
+        callback(new Error('请至少上传一张图片'))
+        return
+      }
+      callback()
+    },
+    // 校验销售属性列表
+    validateSpuSaleAttr(rule, value, callback) {
+      if (!this.spuForm.spuSaleAttrList.length) {
+        callback(new Error('请至少选择一个销售属性'))
+        return
+      }
+      const validateSpuSaleAttrValueList = this.spuForm.spuSaleAttrList.some(
+        item => item.spuSaleAttrValueList.length === 0
+      )
+      if (validateSpuSaleAttrValueList) {
+        callback(new Error('请至少添加一个销售属性具体选项'))
+        return
+      }
+      callback()
+    },
+    // 校验品牌列表
+    validateTradeMark(rule, value, callback) {
+      if (!this.spuForm.tmId) {
+        callback(new Error('请选择品牌'))
+        return
+      }
+      callback()
+    },
+    // 清空Tag列表
+    handleClose(row, index) {
+      row.spuSaleAttrValueList.splice(index, 1)
+    },
     // 清空supForm
     clearSpuForm() {
       this.spuForm.category3Id = ''
@@ -183,39 +228,44 @@ export default {
     },
     // 取消
     cancel() {
+      this.$emit('update_IsShowAddBtn')
+      this.$emit('cancel', this.spuForm.category3Id)
       this.clearSpuForm()
-      this.$emit('cancel')
     },
     // 更新Spu
     async updateSpuInfo() {
-      const imageList = []
-      this.spuForm.spuImageList
-        ? this.spuForm.spuImageList.forEach(image => {
-          imageList.push({
-            id: 0,
-            imgName: image.name,
-            imgUrl: image.url
-          })
-        })
-        : []
+      this.$refs.spuForm.validate(async valid => {
+        if (valid) {
+          const imageList = []
+          this.spuForm.spuImageList
+            ? this.spuForm.spuImageList.forEach(image => {
+              imageList.push({
+                id: 0,
+                imgName: image.name,
+                imgUrl: image.url
+              })
+            })
+            : []
 
-      const data = {
-        category3Id: this.spuForm.category3Id || this.category3id,
-        description: this.spuForm.description,
-        id: this.spuForm.id,
-        spuImageList: imageList,
-        spuName: this.spuForm.spuName,
-        spuSaleAttrList: this.spuForm.spuSaleAttrList,
-        tmId: this.spuForm.tmId
-      }
-      if (this.count) {
-        await this.$API.spu.updateSpuInfo(data)
-      } else {
-        await this.$API.spu.saveSpuInfo(data)
-      }
-
-      this.clearSpuForm()
-      this.$emit('cancel')
+          const data = {
+            category3Id: this.spuForm.category3Id || this.category3id,
+            description: this.spuForm.description,
+            id: this.spuForm.id,
+            spuImageList: imageList,
+            spuName: this.spuForm.spuName,
+            spuSaleAttrList: this.spuForm.spuSaleAttrList,
+            tmId: this.spuForm.tmId
+          }
+          if (this.count) {
+            await this.$API.spu.updateSpuInfo(data)
+          } else {
+            await this.$API.spu.saveSpuInfo(data)
+          }
+          this.$emit('update_IsShowAddBtn')
+          this.$emit('cancel', this.spuForm.category3Id)
+          this.clearSpuForm()
+        }
+      })
     },
     // 删除添加的销售属性
     delSelectedAttr(index) {

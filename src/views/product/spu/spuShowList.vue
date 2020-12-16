@@ -11,17 +11,26 @@
       <el-table-column type="index" label="序号" width="60" />
       <el-table-column label="SPU名称" prop="spuName" />
       <el-table-column label="SPU描述" prop="description" />
-
       <el-table-column label="操作">
         <template slot-scope="{ row }">
-          <el-button size="mini" icon="el-icon-plus" type="primary" />
+          <el-button
+            size="mini"
+            icon="el-icon-plus"
+            type="primary"
+            @click="addSku(row)"
+          />
           <el-button
             size="mini"
             icon="el-icon-edit"
             type="primary"
             @click="edit(row)"
           />
-          <el-button size="mini" icon="el-icon-info" type="info" />
+          <el-button
+            size="mini"
+            icon="el-icon-info"
+            type="info"
+            @click="visible"
+          />
           <el-button
             size="mini"
             icon="el-icon-delete"
@@ -41,16 +50,22 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
+    <SkuShowList />
   </el-card>
 </template>
 
 <script>
+import SkuShowList from '../sku/skuShowList'
 export default {
   name: 'SpuShowList',
-
+  components: { SkuShowList },
+  props: {
+    isShowAddBtn: Boolean
+  },
   data() {
     return {
-      isShowAddBtn: true,
+      // isShowAddBtn: true,
+
       pageSize: 3,
       currentPage: 1,
       total: 0,
@@ -63,9 +78,7 @@ export default {
     this.$bus.$on('change', this.getCategoryId)
     this.$bus.$on('clearList', this.clearList)
     this.$bus.$on('getSpuList', this.get_SpuList)
-    this.$bus.$on('isShowAddBtn', this.isShow_Add_Btn)
-
-    // showUpdataList专用
+    // this.$bus.$on('isShowAddBtn', this.isShow_Add_Btn)
   },
   beforeDestroy() {
     this.$bus.$off('change', this.getCategoryId)
@@ -74,6 +87,12 @@ export default {
     this.$bus.$off('isShowAddBtn', this.isShow_Add_Btn)
   },
   methods: {
+    visible() {
+      this.$bus.$emit('isVisible')
+    },
+    addSku(row) {
+      this.$emit('changeIsShowSku', row)
+    },
     edit(row) {
       this.$emit('showUpdateSpu', row)
     },
@@ -117,9 +136,9 @@ export default {
         this.loading = false
       }
     },
-    isShow_Add_Btn(isShow) {
-      this.isShowAddBtn = isShow
-    },
+    // isShow_Add_Btn(isShow) {
+    //   // this.isShowAddBtn = isShow && false
+    // },
     is_Show_Add() {
       this.$emit('change')
       this.$emit('getCategory3Id', this.category.category3Id)

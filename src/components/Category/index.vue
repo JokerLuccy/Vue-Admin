@@ -97,11 +97,10 @@ export default {
     },
     getAttrInfoList(category) {
       this.isShow = false
-      this.$emit('change', category)
-      this.$emit('spuList', category.category3Id)
+      this.$emit('update_IsShowAddBtn')
+      this.$emit('getCategoryId', category)
       this.$bus.$emit('change', category)
       this.$bus.$emit('getSpuList', category.category3Id)
-      this.$bus.$emit('isShowAddBtn', this.isShow)
     }
   }
 }
