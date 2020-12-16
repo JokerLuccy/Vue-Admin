@@ -49,8 +49,8 @@ import {
   // ButtonGroup,
   // TimeSelect,
   // TimePicker,
-  Popover
-  // Tooltip,
+  Popover,
+  Tooltip
   // Tabs,
   // TabPane,
   // Alert,
@@ -138,7 +138,7 @@ Vue.use(CheckboxGroup)
 // Vue.use(TimeSelect);
 // Vue.use(TimePicker);
 Vue.use(Popover)
-// Vue.use(Tooltip);
+Vue.use(Tooltip)
 // Vue.use(Tabs);
 // Vue.use(TabPane);
 // Vue.use(Alert);

@@ -29,7 +29,7 @@
             size="mini"
             icon="el-icon-info"
             type="info"
-            @click="visible"
+            @click="visible(row)"
           />
           <el-button
             size="mini"
@@ -60,7 +60,9 @@ export default {
   name: 'SpuShowList',
   components: { SkuShowList },
   props: {
-    isShowAddBtn: Boolean
+    isShowAddBtn: Boolean,
+    // eslint-disable-next-line vue/require-default-prop
+    category: Object
   },
   data() {
     return {
@@ -70,25 +72,27 @@ export default {
       currentPage: 1,
       total: 0,
       loading: false,
-      category: {},
+      // category: {},
       spuList: []
     }
   },
   mounted() {
-    this.$bus.$on('change', this.getCategoryId)
+    // this.$bus.$on('change', this.getCategoryId)
     this.$bus.$on('clearList', this.clearList)
     this.$bus.$on('getSpuList', this.get_SpuList)
     // this.$bus.$on('isShowAddBtn', this.isShow_Add_Btn)
   },
   beforeDestroy() {
-    this.$bus.$off('change', this.getCategoryId)
+    // this.$bus.$off('change', this.getCategoryId)
     this.$bus.$off('clearList', this.clearList)
     this.$bus.$off('getSpuList', this.get_SpuList)
     this.$bus.$off('isShowAddBtn', this.isShow_Add_Btn)
   },
   methods: {
-    visible() {
+    visible(row) {
+      // console.log(row)
       this.$bus.$emit('isVisible')
+      this.$bus.$emit('getSkuList', row.id)
     },
     addSku(row) {
       this.$emit('changeIsShowSku', row)
@@ -100,9 +104,9 @@ export default {
       await this.$API.spu.delSingleSpu(row.id)
       this.get_SpuList(row.category3Id)
     },
-    getCategoryId(category) {
+    /*  getCategoryId(category) {
       this.category = category
-    },
+    }, */
     clearList() {
       this.spuList = []
       this.category.category3Id = ''

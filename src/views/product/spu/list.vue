@@ -1,7 +1,7 @@
 <template>
   <div>
     <Category
-      v-if="isShow || isShowSku"
+      v-show="isShow || isShowSku"
       :disabled="!isShow"
       @getCategoryId="getCategoryId"
       @update_IsShowAddBtn="update_IsShowAddBtn"
@@ -9,6 +9,7 @@
     <SpuShowList
       v-if="isShow"
       :is-show-add-btn="isShowAddBtn"
+      :category="category"
       @change="isShowAdd"
       @showUpdateSpu="showUpdateSpu"
       @getCategory3Id="getCategory3Id"
