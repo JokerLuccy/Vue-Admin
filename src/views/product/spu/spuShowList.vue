@@ -90,9 +90,9 @@ export default {
   },
   methods: {
     visible(row) {
-      // console.log(row)
+      console.log(row)
       this.$bus.$emit('isVisible')
-      this.$bus.$emit('getSkuList', row.id)
+      this.$bus.$emit('getSkuList', row)
     },
     addSku(row) {
       this.$emit('changeIsShowSku', row)
